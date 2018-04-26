@@ -59,7 +59,7 @@ public class Thread extends AppCompatActivity {
     private void cancel() {
     }
 
-    @NewThread(value = "子线程", repate = true, period = 10000)
+    @NewThread(value = "子线程", repate = true, period = 10000,delay = 1000)
     @Debounce(value = 2000)
     public void toast() {
         showxc("正在获取...");

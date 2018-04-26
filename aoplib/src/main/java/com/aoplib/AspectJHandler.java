@@ -121,7 +121,7 @@ public class AspectJHandler {
             mark = joinPoint.getSourceLocation().getFileName();
         }
         final String value = mark;
-        final Thread thread = new Thread(new Runnable() {
+        final Thread thread = new MyCircleThread(new MyCircleRunnable() {
             int i = 0;
 
             @Override
@@ -129,14 +129,14 @@ public class AspectJHandler {
                 try {
                     if (i == 0 && delay > 0)
                         Thread.sleep(delay);
-                    else {
+                    else if(i>0) {
                         Thread.sleep(period);
                     }
                     if (threads.containsKey(value)) {
                         joinPoint.proceed();
                         i++;
                         if (repate && period > 0) {
-                            run();
+                            getThread().start();
                         }
                     }
                 } catch (Throwable throwable) {
