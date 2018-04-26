@@ -132,10 +132,12 @@ public class AspectJHandler {
                     else {
                         Thread.sleep(period);
                     }
-                    joinPoint.proceed();
-                    i++;
-                    if (repate && period > 0) {
-                        run();
+                    if (threads.containsKey(value)) {
+                        joinPoint.proceed();
+                        i++;
+                        if (repate && period > 0) {
+                            run();
+                        }
                     }
                 } catch (Throwable throwable) {
                     throwable.printStackTrace();
@@ -169,9 +171,7 @@ public class AspectJHandler {
                         handler.removeCallbacks((Runnable) object);
                     } else {
                         try {
-                            if (((Thread) object).isAlive()) {
-                                ((Thread) object).interrupt();
-                            }
+                            ((Thread) object).interrupt();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

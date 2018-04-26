@@ -37,16 +37,17 @@ public class Thread extends AppCompatActivity {
                 toast();
             }
         });
+        main();
         viewById.setText("点击请求网络吧,延迟3秒显示结果\n @UI @NewThread都可以设置延迟时间");
         System.out.println("MainActivity2主线程 " + java.lang.Thread.currentThread().getId());
     }
 
-    @NewThread(value = "子线程",repate = true,period = 5000)
+    @NewThread(value = "子线程",repate = true,period = 10000)
     @Debounce(value = 2000)
     public void toast() {
         showxc("正在获取...");
-        System.out.println("------------------------------------------toast");
-        System.out.println("MainActivity2子线程 " + java.lang.Thread.currentThread().getId());
+        System.out.println("------------------start------------------------toast");
+        System.out.println("Thread子线程 " + java.lang.Thread.currentThread().getId());
         try {
             URL url = new URL("https://read.qidian.com/chapter/6wiYP-yFPlNrZK4x-CuJuw2/lLgJiXhXccDgn4SMoDUcDQ2");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -68,7 +69,7 @@ public class Thread extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("------------------------------------------toast");
+        System.out.println("-----------------end-------------------------toast");
     }
 
     @UI(delay = 3000,value = "主线程")
@@ -84,9 +85,9 @@ public class Thread extends AppCompatActivity {
         tv.setText(s);
     }
 
-    @UI
+    @UI(repate = true,delay = 2000)
     public void main() {
-        System.out.println("MainActivity2主线程2 " + java.lang.Thread.currentThread().getId());
+        System.out.println("Thread主线程2 " + java.lang.Thread.currentThread().getId());
     }
 
     @CancelThread(value = {"主线程","子线程"})
