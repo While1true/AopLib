@@ -129,7 +129,7 @@ public class AspectJHandler {
                 try {
                     if (i == 0 && delay > 0)
                         Thread.sleep(delay);
-                    else {
+                    else if(i>0) {
                         Thread.sleep(period);
                     }
                     if (threads.containsKey(value)) {
