@@ -33,7 +33,7 @@ public class Thread extends AppCompatActivity {
         viewById.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println(v.getId());
+                showxc("正在获取...");
                 toast();
             }
         });
@@ -42,7 +42,7 @@ public class Thread extends AppCompatActivity {
     }
 
     @NewThread(value = "子线程")
-    @Debounce(value = 5000)
+    @Debounce(value = 2000)
     public void toast() {
         System.out.println("MainActivity2子线程 " + java.lang.Thread.currentThread().getId());
         try {
@@ -56,8 +56,10 @@ public class Thread extends AppCompatActivity {
                 while ((str = reader.readLine()) != null) {
                     stringBuffer.append(str);
                 }
-                showxc("获取数据成功，准备延迟3s展示");
-                show(stringBuffer.toString());
+                showxc("开始解析...");
+                Spanned text = Html.fromHtml(stringBuffer.toString());
+                showxc("完成解析，准备延迟3s展示");
+                show(text);
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -68,19 +70,15 @@ public class Thread extends AppCompatActivity {
     }
 
     @UI(delay = 3000,value = "主线程")
-    private void show(String s) {
+    private void show(CharSequence s) {
         TextView tv = findViewById(R.id.content);
-        System.out.println("开始解析展示" + (System.currentTimeMillis() - aLong));
-        Spanned text = Html.fromHtml(s);
-        System.out.println("结束解析展示" + (System.currentTimeMillis() - aLong));
-        tv.setText(text);
+        tv.setText(s);
     }
 
     @UI
     private void showxc(String s) {
         aLong = System.currentTimeMillis();
         TextView tv = findViewById(R.id.content);
-        tv.setMovementMethod(ScrollingMovementMethod.getInstance());
         tv.setText(Html.fromHtml(s));
     }
 
