@@ -10,9 +10,10 @@
         toast();
  ```
 ### 2.UI标记的在主线程执行 NewThread标记的在子线程执行 配合CancelThread 在销毁时取消事件，防止内存泄漏
+`不支持有返回值的方法，请用回调`
 ```aidl
-    //默认标记都是类名.java 延迟为0
-    @UI(delay = 3000,value = "主线程")
+    //默认标记都是类名.java 延迟为0,重复执行为false, period重复执行间隔
+    @UI(delay = 3000,value = "主线程",repate=false,period=2000)
     private void show(CharSequence s) {
         TextView tv = findViewById(R.id.content);
         tv.setText(s);

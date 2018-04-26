@@ -41,9 +41,11 @@ public class Thread extends AppCompatActivity {
         System.out.println("MainActivity2主线程 " + java.lang.Thread.currentThread().getId());
     }
 
-    @NewThread(value = "子线程")
+    @NewThread(value = "子线程",repate = true,period = 5000)
     @Debounce(value = 2000)
     public void toast() {
+        showxc("正在获取...");
+        System.out.println("------------------------------------------toast");
         System.out.println("MainActivity2子线程 " + java.lang.Thread.currentThread().getId());
         try {
             URL url = new URL("https://read.qidian.com/chapter/6wiYP-yFPlNrZK4x-CuJuw2/lLgJiXhXccDgn4SMoDUcDQ2");
@@ -66,7 +68,7 @@ public class Thread extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        main();
+        System.out.println("------------------------------------------toast");
     }
 
     @UI(delay = 3000,value = "主线程")

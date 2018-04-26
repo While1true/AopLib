@@ -25,4 +25,16 @@ public @interface NewThread {
      * @return
      */
     int delay() default 0;
+
+    /**
+     * 是否自动重复执行
+     * @return
+     */
+    boolean repate() default false;
+
+    /**
+     * 重复间隔
+     * @return
+     */
+    int period() default 2000;
 }

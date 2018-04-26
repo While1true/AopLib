@@ -22,7 +22,7 @@ import java.util.Map;
  */
 
 @Aspect
-public class AspextJHandler {
+public class AspectJHandler {
     Map<String, Long> debounceMaps = new HashMap<>(3);
 
     Map<String, List<Object>> threads = new HashMap<>(3);
@@ -35,9 +35,11 @@ public class AspextJHandler {
     @Pointcut("execution(@com.aoplib.UI * *(..))")
     public void UI() {
     }
+
     @Pointcut("execution(@com.aoplib.NewThread * *(..))")
     public void NewThread() {
     }
+
     @Pointcut("execution(@com.aoplib.CancelThread * *(..))")
     public void CancelThread() {
     }
@@ -46,8 +48,8 @@ public class AspextJHandler {
     public Object debounce(ProceedingJoinPoint joinPoint, Debounce annotation) {
         Object[] args = joinPoint.getArgs();
         String key = annotation.mark();
-        if(TextUtils.isEmpty(key)){
-            key=joinPoint.getSourceLocation().getFileName();
+        if (TextUtils.isEmpty(key)) {
+            key = joinPoint.getSourceLocation().getFileName();
         }
         if (joinPoint.getSignature().getName().equals("onClick")) {
             if (args != null && args.length == 1 && args[0] instanceof View) {
@@ -80,11 +82,13 @@ public class AspextJHandler {
     @Around("UI()&&@annotation(annotation)")
     public void ui(final ProceedingJoinPoint joinPoint, UI annotation) {
         String mark = annotation.value();
-        int delay = annotation.delay();
-        if(TextUtils.isEmpty(mark)){
-            mark=joinPoint.getSourceLocation().getFileName();
+        final boolean repate = annotation.repate();
+        final int delay = annotation.delay();
+        final int period = annotation.period();
+        if (TextUtils.isEmpty(mark)) {
+            mark = joinPoint.getSourceLocation().getFileName();
         }
-        final String value=mark;
+        final String value = mark;
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -94,29 +98,45 @@ public class AspextJHandler {
                         objects = new ArrayList<>();
                         threads.put(value, objects);
                     }
-                    objects.add(this);
+                    if (!objects.contains(this))
+                        objects.add(this);
                     joinPoint.proceed();
+                    if (repate && period > 0) {
+                        handler.postDelayed(this, period);
+                    }
                 } catch (Throwable throwable) {
                     throwable.printStackTrace();
                 }
             }
-        },delay);
+        }, delay);
     }
 
     @Around("NewThread()&&@annotation(annotation)")
     public void newThread(final ProceedingJoinPoint joinPoint, NewThread annotation) {
         String mark = annotation.value();
+        final boolean repate = annotation.repate();
         final int delay = annotation.delay();
-        if(TextUtils.isEmpty(mark)){
-            mark=joinPoint.getSourceLocation().getFileName();
+        final int period = annotation.period();
+        if (TextUtils.isEmpty(mark)) {
+            mark = joinPoint.getSourceLocation().getFileName();
         }
-        final String value=mark;
-        Thread thread=new Thread(new Runnable() {
+        final String value = mark;
+        final Thread thread = new Thread(new Runnable() {
+            int i = 0;
+
             @Override
             public void run() {
                 try {
-                    Thread.sleep(delay);
+                    if (i == 0 && delay > 0)
+                        Thread.sleep(delay);
+                    else {
+                        Thread.sleep(period);
+                    }
                     joinPoint.proceed();
+                    i++;
+                    if (repate && period > 0) {
+                        run();
+                    }
                 } catch (Throwable throwable) {
                     throwable.printStackTrace();
                 }
@@ -134,18 +154,22 @@ public class AspextJHandler {
     @Before("CancelThread()&&@annotation(annotation)")
     public void cancelThread(JoinPoint joinPoint, CancelThread annotation) {
         String[] value = annotation.value();
-        if(value.length==0){
-            value=new String[]{joinPoint.getSourceLocation().getFileName()};
+        String[] newvaule = new String[value.length + 1];
+        newvaule[value.length] = joinPoint.getSourceLocation().getFileName();
+        for (int i = 0; i < value.length; i++) {
+            newvaule[i] = value[i];
         }
+        value = newvaule;
+
         for (String key : value) {
             List<Object> objects = threads.get(key);
-            if(objects!=null){
+            if (objects != null) {
                 for (Object object : objects) {
-                    if(object instanceof Runnable){
+                    if (object instanceof Runnable) {
                         handler.removeCallbacks((Runnable) object);
-                    }else {
+                    } else {
                         try {
-                            if(((Thread)object).isAlive()) {
+                            if (((Thread) object).isAlive()) {
                                 ((Thread) object).interrupt();
                             }
                         } catch (Exception e) {
@@ -155,7 +179,7 @@ public class AspextJHandler {
                 }
             }
             threads.remove(key);
-            System.out.println("标记为 "+key+" 的任务已取消");
+            System.out.println("标记为 " + key + " 的任务已取消");
         }
     }
     //    @AfterReturning(pointcut = "Debounce()",returning = "result")
