@@ -79,7 +79,7 @@ public class Thread extends AppCompatActivity {
     private void showxc(String s) {
         aLong = System.currentTimeMillis();
         TextView tv = findViewById(R.id.content);
-        tv.setText(Html.fromHtml(s));
+        tv.setText(s);
     }
 
     @UI
