@@ -7,23 +7,49 @@
             System.out.println("toast");
             Toast.makeText(this,"cccccccc",Toast.LENGTH_LONG).show();
         }
-        toast()；
+        toast();
  ```
 ### 2.UI标记的在主线程执行 NewThread标记的在子线程执行 配合CancelThread 在销毁时取消事件，防止内存泄漏
 ```aidl
-//默认标记都是类名.java 延迟为0
-       @UI(delay = 3000,value = "主线程")
-       private void show(String s) {
-            TextView tv = findViewById(R.id.content);
-            System.out.println("开始解析展示" + (System.currentTimeMillis() - aLong));
-            Spanned text = Html.fromHtml(s);
-            System.out.println("结束解析展示" + (System.currentTimeMillis() - aLong));
-            tv.setText(text);
+    //默认标记都是类名.java 延迟为0
+    @UI(delay = 3000,value = "主线程")
+    private void show(CharSequence s) {
+        TextView tv = findViewById(R.id.content);
+        tv.setText(s);
+    }
+
+    @UI
+    private void showxc(String s) {
+        TextView tv = findViewById(R.id.content);
+        tv.setText(s);
+    }
+    @NewThread(value = "子线程")
+    @Debounce(value = 2000)
+    public void toast() {
+        System.out.println("MainActivity2子线程 " + java.lang.Thread.currentThread().getId());
+        try {
+            URL url = new URL("https://read.qidian.com/chapter/6wiYP-yFPlNrZK4x-CuJuw2/lLgJiXhXccDgn4SMoDUcDQ2");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setInstanceFollowRedirects(true);
+            if (connection.getResponseCode() == 200) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuffer stringBuffer = new StringBuffer();
+                String str;
+                while ((str = reader.readLine()) != null) {
+                    stringBuffer.append(str);
+                }
+                showxc("开始解析...");
+                Spanned text = Html.fromHtml(stringBuffer.toString());
+                showxc("完成解析，准备延迟3s展示");
+                show(text);
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        @NewThread(delay = 3000,value = "子线程")
-        private void show(String s) {
-          //请求网络
-        }
+     }
+     
         @CancelThread(value = {"主线程","子线程"})
         void onDestory(){}
 ```
