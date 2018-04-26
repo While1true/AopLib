@@ -41,7 +41,7 @@ public class Thread extends AppCompatActivity {
         System.out.println("MainActivity2主线程 " + java.lang.Thread.currentThread().getId());
     }
 
-    @NewThread
+    @NewThread(value = "子线程")
     @Debounce(value = 5000)
     public void toast() {
         System.out.println("MainActivity2子线程 " + java.lang.Thread.currentThread().getId());
@@ -67,7 +67,7 @@ public class Thread extends AppCompatActivity {
         main();
     }
 
-    @UI(delay = 3000)
+    @UI(delay = 3000,value = "主线程")
     private void show(String s) {
         TextView tv = findViewById(R.id.content);
         System.out.println("开始解析展示" + (System.currentTimeMillis() - aLong));
@@ -89,7 +89,7 @@ public class Thread extends AppCompatActivity {
         System.out.println("MainActivity2主线程2 " + java.lang.Thread.currentThread().getId());
     }
 
-    @CancelThread
+    @CancelThread(value = {"主线程","子线程"})
     @Override
     protected void onDestroy() {
         super.onDestroy();
