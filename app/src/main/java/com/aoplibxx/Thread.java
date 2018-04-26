@@ -24,17 +24,30 @@ import java.net.URL;
 public class Thread extends AppCompatActivity {
 
     private long aLong;
+    private TextView viewById;
+    private boolean start;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        TextView viewById = findViewById(R.id.bt);
+        viewById = findViewById(R.id.bt);
+
         viewById.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showxc("正在获取...");
-                toast();
+                if (!start) {
+                    start = true;
+                    toast();
+                }
+            }
+        });
+        findViewById(R.id.stop).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancel();
+                start=false;
             }
         });
         main();
@@ -42,7 +55,11 @@ public class Thread extends AppCompatActivity {
         System.out.println("MainActivity2主线程 " + java.lang.Thread.currentThread().getId());
     }
 
-    @NewThread(value = "子线程",repate = true,period = 10000)
+    @CancelThread("子线程")
+    private void cancel() {
+    }
+
+    @NewThread(value = "子线程", repate = true, period = 10000)
     @Debounce(value = 2000)
     public void toast() {
         showxc("正在获取...");
@@ -59,6 +76,7 @@ public class Thread extends AppCompatActivity {
                 while ((str = reader.readLine()) != null) {
                     stringBuffer.append(str);
                 }
+                viewById.getLayoutParams();
                 showxc("开始解析...");
                 Spanned text = Html.fromHtml(stringBuffer.toString());
                 showxc("完成解析，准备延迟3s展示");
@@ -72,7 +90,7 @@ public class Thread extends AppCompatActivity {
         System.out.println("-----------------end-------------------------toast");
     }
 
-    @UI(delay = 3000,value = "主线程")
+    @UI(delay = 3000, value = "主线程")
     private void show(CharSequence s) {
         TextView tv = findViewById(R.id.content);
         tv.setText(s);
@@ -85,12 +103,12 @@ public class Thread extends AppCompatActivity {
         tv.setText(s);
     }
 
-    @UI(repate = true,delay = 2000)
+    @UI(repate = true, delay = 2000)
     public void main() {
         System.out.println("Thread主线程2 " + java.lang.Thread.currentThread().getId());
     }
 
-    @CancelThread(value = {"主线程","子线程"})
+    @CancelThread(value = {"主线程", "子线程"})
     @Override
     protected void onDestroy() {
         super.onDestroy();
