@@ -6,25 +6,23 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by 不听话的好孩子 on 2018/4/23.
+ * Created by 不听话的好孩子 on 2018/4/26.
+ * 在UI线程执行方法
+ * 需要与取消{@link CancelThread}共同使用
  */
 
-/**
- * 多少毫秒内 只调标记用第一次
- */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface Debounce {
-
+public @interface UI {
     /**
-     * 时间间隔
+     * 默认根据是所在类名mark
      * @return
      */
-    int value() default 1000;
+    String value() default "";
 
     /**
-     * 如果不是onClick（View v)就根据mark计算时间差值,如果是就按view的id，忽略mark
+     * 延迟时间
      * @return
      */
-    String mark() default "";
+    int delay() default 0;
 }
